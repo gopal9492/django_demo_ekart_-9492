@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit User Details</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+<div class="container">
+    <div class="title">Edit User Details</div>
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
+    <div class="content">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="user-details">
+                <div class="input-box">
+                    <span class="details">Full Name</span>
+                    <input type="text" id="fullname" name="fullname" value="{{ user.fullname }}" required>
+                </div>
+                <div class="input-box">
+                    <span class="details">Email</span>
+                    <input type="email" id="email" name="email" value="{{ user.email }}" required>
+                </div>
+                <div class="input-box">
+                    <span class="details">password</span>
+                    <input type="text" id="password" name="password" value="{{ user.password }}" required>
+                </div>
+                <div class="input-box">
+                    <span class="details">Mobile</span>
+                    <input type="text" id="mobile" name="mobile" value="{{ user.mobile }}" required>
+                </div>
+                <div class="input-box">
+                    <span class="details">Gender</span>
+                    <select id="gender" name="gender" required>
+                        <option value="Male" {% if user.gender == 'Male' %}selected{% endif %}>Male</option>
+                        <option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>
+                        <option value="Other" {% if user.gender == 'Other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+                <div class="input-box">
+                    <span class="details">City</span>
+                    <input type="text" id="city" name="city" value="{{ user.city }}" required>
+                </div>
+            </div>
+            <div class="button">
+                <input type="submit" value="Save Changes">
+            </div>
+        </form>
+    </div>
+    <div class="footer">
+        <p>Go back to <a href="{% url 'home' %}">Home page</a></p><br>
+    </div>
+</div>
+</body>
+</html>

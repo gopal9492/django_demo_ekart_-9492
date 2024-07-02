@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}E-commerce Website{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .input-box {
+            display: flex;
+            justify-content: space-between ;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .details {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="title">User Profile</div>
+    <div class="content">
+        <div class="user-details">
+            <div class="input-box">
+                <span class="details">Full Name</span>
+                <p>{{ user.fullname }}</p>
+            </div>
+            <div class="input-box">
+                <span class="details">Username</span>
+                <p>{{ user.username }}</p>
+            </div>
+            <div class="input-box">
+                <span class="details">Email</span>
+                <p>{{ user.email }}</p>
+            </div>
+            <div class="input-box">
+                <span class="details">Mobile</span>
+                <p>{{ user.mobile }}</p>
+            </div>
+            <div class="input-box">
+                <span class="details">Gender</span>
+                <p>{{ user.gender }}</p>
+            </div>
+            <div class="input-box">
+                <span>City</span>
+                <p>{{ user.city }}</p>
+            </div>
+            <div class="button">
+                <a href="{% url 'edit_user_details' %}">Edit Profile</a>
+            </div>
+        </div>
+    </div>
+
+    <div><a href="{% url 'home' %}">Go Back To Home page</a></div>
+</div>
+</body>
+</html>

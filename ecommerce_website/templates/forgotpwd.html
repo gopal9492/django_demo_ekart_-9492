@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <title>Login Form</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div class="container">
+      <div class="title">Login</div>
+      {% if messages %}
+        {% for message in messages %}
+          <p style='color:red'>{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+      <div class="content">
+        <form method="post" enctype="multipart/form-data" action="">
+          {% csrf_token %}
+          <div class="user-details">
+            <div class="input-box">
+              <span class="details">Username</span>
+              <input type="text" id="username" name="username" placeholder="Enter your username" required>
+            </div>
+          </div>
+          <div class="button">
+            <input type="submit" value="Login">
+          </div>
+        </form>
+      </div>
+      <div class="footer">
+        <p>Go to the login page? <a href="{% url 'login' %}">Click here</a></p>
+        <p>Don't have an account? <a href="{% url 'signup' %}">Sign up</a></p>
+      </div>
+    </div>
+  </body>
+</html>

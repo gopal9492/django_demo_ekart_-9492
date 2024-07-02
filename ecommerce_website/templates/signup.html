@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+<div class="container">
+    <div class="title">Sign Up</div>
+    {% if error_message %}
+        <p style='color:red'>{{ error_message }}</p>
+    {% endif %}
+    <div class="content">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="user-details">
+                <div class="input-box">
+                    <span class="details">Full Name</span>
+                    <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" required>
+                </div>
+                <div class="input-box">
+                    <span class="details">Username</span>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                </div>
+                <div class="input-box">
+                    <span class="details">Email</span>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                </div>
+                <div class="input-box">
+                    <span class="details">Password</span>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                </div>
+                <div class="input-box">
+                    <span class="details">Mobile</span>
+                    <input type="text" id="mobile" name="mobile" placeholder="Enter your mobile number" required>
+                </div>
+                <div class="input-box">
+                    <span class="details">Profile Image</span>
+                    <input type="file" id="img" name="img" accept="image/*" required>
+                </div>
+                <div class="input-box">
+                    <span class="details">Gender</span>
+                    <select id="gender" name="gender" required>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="input-box">
+                    <span class="details">City</span>
+                    <input type="text" id="city" name="city" placeholder="Enter your city" required>
+                </div>
+            </div>
+            <div class="button">
+                <input type="submit" value="Sign Up">
+            </div>
+        </form>
+    </div>
+    <div class="footer">
+        <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+    </div>
+</div>
+</body>
+</html>

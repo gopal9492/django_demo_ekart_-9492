@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cart Details</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+
+    <style>
+        .cart-items{
+             display:flex;
+        }
+        .cart-item{
+             padding-right:40px;
+        }
+        .cart-items img {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="title">Cart Details</div><br>
+    <div class="content">
+        <div class="cart-items">
+            {% for entry in cart_items %}
+            <tr>
+                <div class="cart-item">
+                    <img src="{{ entry.item.product.image.url }}" alt="{{ entry.item.product.name }}">
+                    <h3>{{ entry.item.product.name }}</h3>
+                    <p>Price: ${{ entry.item.product.price }}</p>
+                    <p>Quantity: {{ entry.item.quantity }}</p>
+                    <p>Total: ${{ entry.total }}</p>
+                    <a href="{% url 'remove_from_cart' entry.item.id %}">Remove</a>
+                </div>
+            </tr>
+            {% empty %}
+                <p>No items in cart.</p>
+            {% endfor %}
+        </div><br>
+        <div class="total-price">
+            <h3>Total Price: ${{ total_price }}</h3><br>
+        </div>
+
+        <div >
+            <p>Continue to <a href="{% url 'payment' %}">Payment</a></p>
+        </div>
+
+    </div><br>
+
+    <div class="footer">
+        <p>Go back to <a href="{% url 'home' %}">Home page</a></p><br>
+    </div>
+</div>
+</body>
+</html>

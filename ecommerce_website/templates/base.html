@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}E-commerce Website{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="user-info">
+                <div class="profile-info">
+                    <img src="{{ request.user.profile_image.url }}" alt="Profile Image">
+                    <div>
+                        <span>{{ request.user.fullname }}</span><br>
+                        <a href="#" id="user-menu-toggle">Menu</a>
+                    </div>
+                    <div class="user-menu" id="user-menu">
+                        <div class="user-menu-item"><a href="{% url 'user_profile' %}">View Profile</a></div>
+                        <div class="user-menu-item"><a href="{% url 'edit_user_details' %}">Change Details</a></div>
+                        <div class="user-menu-item"><a href="{% url 'logout' %}">Logout</a></div>
+                    </div>
+                </div>
+                <div>
+                    <a href="{% url 'cart' %}">Cart Details</a>
+                </div>
+            </div>
+        </header>
+        {% block content %}
+        {% endblock %}
+    </div>
+    <script>
+        document.getElementById('user-menu-toggle').addEventListener('click', function() {
+            document.getElementById('user-menu').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>
