@@ -34,7 +34,7 @@
                 </div>
                 <div class="input-box">
                     <span class="details">Mobile</span>
-                    <input type="text" id="mobile" name="mobile" placeholder="Enter your mobile number" required>
+                    <input type="number" id="mobile" name="mobile" placeholder="Enter your mobile number" required oninput="validatemobileinput(this)">
                 </div>
                 <div class="input-box">
                     <span class="details">Profile Image</span>
@@ -62,5 +62,12 @@
         <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>
     </div>
 </div>
+<script>
+    function validatemobileinput(input) {
+        if (input.value.length > 10) {
+            input.value = input.value.slice(0, 10);
+        }
+    }
+</script>
 </body>
 </html>

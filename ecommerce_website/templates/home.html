@@ -29,6 +29,8 @@
         }
         .product {
             display: inline-block;
+            padding-left: 120px !important;
+            padding-right: 50px !important;
             margin-bottom: 20px;
             background-color: #f9f9f9;
             padding: 10px;
@@ -79,18 +81,23 @@
     </style>
 </head>
 <body>
+  {{ redirect_to_login_immediately }}
     <div class="container">
         <div class="header">
             <tr>
-                <img src="{% if user.profile_image %}{{ user.profile_image.url }}{% endif %}" style="width: 70px; height: 80px; border-radius: 50%;">
-                <div><span>{{ user.fullname }}</span></div>
+                <div>
+                    <img src="{% if user.profile_image %}{{ user.profile_image.url }}{% endif %}" style="width: 70px; height: 80px; border-radius: 50%;">
+                    <br>
+                    <span><b>&nbsp;{{ user.fullname }}</b></span>
+                </div>
+
                 <div><a href="{% url 'user_profile' %}">View Profile</a></div>
-                <div><a href="{% url 'edit_user_details' %}">Change Details</a></div>
-                <div><a href="{% url 'cart' %}" class="cart-details-link">Cart Details</a></div>
+                <div><a href="{% url 'edit_user_details' %}">Edit Profile</a></div>
+                <div><a href="{% url 'cart' %}" class="cart-details-link">Cart Items</a></div>
                 <div><a href="{% url 'logout' %}" class="logout-link">Logout</a></div>
             </tr>
         </div>
-        <div class="title" align="center"><u>Welcome to Our E-commerce Store</u></div> <br><br>
+        <div class="title" align="center"><u>Welcome to Our E-commerce Web Store</u></div> <br><br>
 
         <div id="popup-message" class="popup-message"></div>
 
@@ -100,7 +107,7 @@
                     <img src="{{ product.image.url }}" alt="{{ product.name }}">
                     <div class="product-details">
                         <h3>{{ product.name }}</h3>
-                        <p class="price">${{ product.price }}</p>
+                        <p class="price">{{ product.price }}</p>
                         <a href="{% url 'add_to_cart' product.id %}" class="add-to-cart-btn">Add to Cart</a>
                     </div>
                 </div>
@@ -125,26 +132,6 @@
                 popup.style.display = 'none';
             }, 3000);
         }
-
-
-
-
-
-
-    var timeoutDuration = 60000;
-    var timeout;
-    function resetTimer() {
-        clearTimeout(timeout);
-        timeout = setTimeout(logout, timeoutDuration);
-    }
-
-    function logout() {
-        window.location.href = "{% url 'logout' %}";
-    }
-
-    document.addEventListener("mousemove", resetTimer);
-    document.addEventListener("keydown", resetTimer);
-    document.addEventListener("scroll", resetTimer);
     </script>
 </body>
 </html>

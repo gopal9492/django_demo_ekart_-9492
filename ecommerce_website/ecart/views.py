@@ -1,31 +1,22 @@
-from datetime import datetime
-
 from django.conf import settings
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.contrib.auth.hashers import make_password, check_password
 from .models import user_profiles, user_product, user_cart
 
 
 def home(request):
-    if not request.user.is_authenticated:
+    user_id = request.session.get('user_id')
+    if not user_id:
         return redirect('login')
 
-    last_activity_time = request.session.get('last_activity_time')
-    if not last_activity_time:
-        request.session['last_activity_time'] = datetime.now().timestamp()
-    else:
-        current_time = datetime.now().timestamp()
-        if current_time - last_activity_time > 60:
-            del request.session['user_id']
-            messages.success(request, "You have been automatically logged out due to inactivity.")
-            return redirect('login')
-        else:
-            request.session['last_activity_time'] = current_time
+    try:
+        user = user_profiles.objects.get(id=user_id)
+    except user_profiles.DoesNotExist:
+        return redirect('login')
 
-    user_id = request.session.get('user_id')
-    user = user_profiles.objects.get(id=user_id)
     products = user_product.objects.all()
     context = {
         'products': products,
@@ -40,13 +31,15 @@ def login_page(request):
         password = request.POST['password']
 
         try:
-            user = user_profiles.objects.get(username=username, password=password)
-            request.session['user_id'] = user.id
-            return redirect('home')
+            user = user_profiles.objects.get(username=username)
+            if check_password(password, user.password):
+                request.session['user_id'] = user.id
+                return redirect('home')
+            else:
+                error_message = "Invalid username/password."
         except user_profiles.DoesNotExist:
             error_message = "Invalid username/password."
             return render(request, 'login.html', {'error_message': error_message})
-
     return render(request, 'login.html')
 
 
@@ -55,7 +48,7 @@ def signup_page(request):
         fullname = request.POST['fullname']
         username = request.POST['username']
         email = request.POST['email']
-        password = request.POST['password']
+        password = make_password(request.POST['password'])
         mobile = request.POST['mobile']
         profile_image = request.FILES['img']
         gender = request.POST['gender']
@@ -97,8 +90,6 @@ def edit_user_details(request):
         user.mobile = request.POST.get('mobile')
         user.gender = request.POST.get('gender')
         user.city = request.POST.get('city')
-        if 'img' in request.FILES:
-            user.profile_image = request.FILES['img']
         user.save()
         return redirect('user_profile')
 
@@ -119,7 +110,7 @@ def forgot_pwd(request):
             user = user_profiles.objects.get(username=username)
             password = user.password
             send_password_email(user, password)
-            messages.success(request, "Successfully sent password reset email.")
+            messages.success(request, "Successfully sent password to email.")
             return redirect('login')
         except user_profiles.DoesNotExist:
             messages.error(request, "Username does not exist.")
@@ -129,8 +120,8 @@ def forgot_pwd(request):
 
 
 def send_password_email(user, password):
-    subject = 'Your Password Recovery'
-    message = f'Hello {user.fullname},\n\nYour password is: {password}\n\nThank you!'
+    subject = 'Password Recovery'
+    message = f'Hello {user.fullname},\n\n Your password is: {password}\n\n Thank you!'
     from_email = settings.EMAIL_HOST_USER
     to_email = [user.email]
 
@@ -167,7 +158,7 @@ def add_to_cart(request, product_id):
         product = user_product.objects.get(id=product_id)
         cart_item, created = user_cart.objects.get_or_create(user=user, product=product)
         if not created:
-            cart_item.quantity += 1
+            cart_item.quantity = cart_item.quantity + 1
             cart_item.save()
     except (user_profiles.DoesNotExist, user_product.DoesNotExist):
         return HttpResponse('User or Product not found')

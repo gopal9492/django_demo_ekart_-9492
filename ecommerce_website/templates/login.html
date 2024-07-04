@@ -28,6 +28,7 @@
         {% if error_message %}
             <p style='color:red'>{{ error_message }}</p>
         {% endif %}
+
       <div id="popup-message" class="popup-message"></div>
       <div class="content">
         <form method="post" enctype="multipart/form-data" action="">
@@ -52,11 +53,12 @@
         <p>Don't have an account? <a href="{% url 'signup' %}">Sign up</a></p>
       </div>
     </div>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            {% if message %}
-            showPopupMessage("{{ message }}");
+            {% if messages %}
+                {% for message in messages %}
+                   showPopupMessage("{{ message }}");
+                {% endfor %}
             {% endif %}
         });
 

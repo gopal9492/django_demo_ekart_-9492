@@ -25,5 +25,4 @@ class user_cart(models.Model):
     product = models.ForeignKey(user_product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
 
-    def total_price(self):
-        return self.product.price * self.quantity
+

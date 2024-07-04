@@ -26,11 +26,11 @@
                 </div>
                 <div class="input-box">
                     <span class="details">password</span>
-                    <input type="text" id="password" name="password" value="{{ user.password }}" required>
+                    <input type="password" id="password" name="password" value="{{ user.password }}" required>
                 </div>
                 <div class="input-box">
                     <span class="details">Mobile</span>
-                    <input type="text" id="mobile" name="mobile" value="{{ user.mobile }}" required>
+                    <input type="number" id="mobile" name="mobile" value="{{ user.mobile }}" required oninput="validatemobileinput(this)">
                 </div>
                 <div class="input-box">
                     <span class="details">Gender</span>
@@ -54,5 +54,13 @@
         <p>Go back to <a href="{% url 'home' %}">Home page</a></p><br>
     </div>
 </div>
+
+<script>
+    function validatemobileinput(input) {
+        if (input.value.length > 10) {
+            input.value = input.value.slice(0, 10);
+        }
+    }
+</script>
 </body>
 </html>

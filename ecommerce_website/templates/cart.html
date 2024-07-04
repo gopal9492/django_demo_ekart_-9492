@@ -30,10 +30,11 @@
             <tr>
                 <div class="cart-item">
                     <img src="{{ entry.item.product.image.url }}" alt="{{ entry.item.product.name }}">
+                    <!--<p>Name: {{entry.item.user.username}}</p>-->
                     <h3>{{ entry.item.product.name }}</h3>
-                    <p>Price: ${{ entry.item.product.price }}</p>
+                    <p>Price: {{ entry.item.product.price }}</p>
                     <p>Quantity: {{ entry.item.quantity }}</p>
-                    <p>Total: ${{ entry.total }}</p>
+                    <p>Total: {{ entry.total }}</p>
                     <a href="{% url 'remove_from_cart' entry.item.id %}">Remove</a>
                 </div>
             </tr>
@@ -42,11 +43,15 @@
             {% endfor %}
         </div><br>
         <div class="total-price">
-            <h3>Total Price: ${{ total_price }}</h3><br>
+            <h3>Total Price: {{ total_price }}</h3><br>
         </div>
 
         <div >
-            <p>Continue to <a href="{% url 'payment' %}">Payment</a></p>
+            {% if total_price == 0 %}
+		        <p>Payment is disabled for zero total price.</p>
+            {% else %}
+                 <p>Continue to <a href="{% url 'payment' %}">Payment</a></p>
+            {% endif %}
         </div>
 
     </div><br>
