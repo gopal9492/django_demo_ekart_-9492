@@ -1,75 +1,99 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
-    <meta charset="UTF-8">
-    <title>Login Form</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'styles.css' %}">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+  <meta charset="UTF-8">
+  <title>Login Form</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'styles.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-       .popup-message {
-            display: none;
-            position: fixed;
-            top: 22%;
-            right: 25%;
-            background-color: #4caf50;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-        }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="title">Login</div>
-        {% if error_message %}
-            <p style='color:red'>{{ error_message }}</p>
-        {% endif %}
+  <style>
+    .popup-message {
+      display: none;
+      position: fixed;
+      top: 22%;
+      right: 25%;
+      background-color: #4caf50;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+    .password-section{
 
-      <div id="popup-message" class="popup-message"></div>
-      <div class="content">
-        <form method="post" enctype="multipart/form-data" action="">
-          {% csrf_token %}
-          <div class="user-details">
-            <div class="input-box">
-              <span class="details">Username</span>
-              <input type="text" id="username" name="username" placeholder="Enter your username" required>
-            </div>
-            <div class="input-box">
-              <span class="details">Password</span>
-              <input type="password" id="password" name="password"  placeholder="Enter your password" required>
-            </div>
+    }
+
+
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="title">Login</div>
+  {% if error_message %}
+  <p style='color:red'>{{ error_message }}</p>
+  {% endif %}
+
+  <div id="popup-message" class="popup-message"></div>
+  <div class="content">
+    <form method="post" enctype="multipart/form-data" action="">
+      {% csrf_token %}
+      <div class="user-details">
+        <div class="input-box">
+          <span class="details">Username <span style="color:red">*</span></span>
+          <input type="text" id="username" name="username" placeholder="Enter your username" required>
+        </div>
+        <div class="input-box">
+          <span class="details">Password <span style="color:red">*</span></span>
+          <div class="password-section">
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            <span class="fa fa-fw fa-eye field-icon toggle-password"></span>
           </div>
-          <div class="button">
-            <input type="submit" value="Login">
-          </div>
-        </form>
+        </div>
       </div>
-      <div class="footer">
-        <p>Forgot your password? <a href="{% url 'forgotpwd' %}">Click here</a></p>
-        <p>Don't have an account? <a href="{% url 'signup' %}">Sign up</a></p>
-      </div>
-    </div>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            {% if messages %}
-                {% for message in messages %}
-                   showPopupMessage("{{ message }}");
-                {% endfor %}
-            {% endif %}
-        });
 
-        function showPopupMessage(message) {
-            const popup = document.getElementById('popup-message');
-            popup.innerText = message;
-            popup.style.display = 'block';
-            setTimeout(() => {
-                popup.style.display = 'none';
-            }, 3000);
-        }
-    </script>
-  </body>
+      <div class="button">
+        <input type="submit" value="Login">
+      </div>
+    </form>
+  </div>
+  <div class="footer">
+    <p>Forgot your password? <a href="{% url 'forgotpwd' %}">Click here</a></p>
+    <p>Don't have an account? <a href="{% url 'signup' %}">Sign up</a></p>
+  </div>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    {% if messages %}
+    {% for message in messages %}
+    showPopupMessage("{{ message }}");
+    {% endfor %}
+    {% endif %}
+  });
+
+  function showPopupMessage(message) {
+    const popup = document.getElementById('popup-message');
+    popup.innerText = message;
+    popup.style.display = 'block';
+    setTimeout(() => {
+      popup.style.display = 'none';
+    }, 3000);
+  }
+
+  document.querySelector(".toggle-password").addEventListener("click", function() {
+    const passwordInput = document.getElementById("password");
+    const fieldType = passwordInput.getAttribute("type");
+    if (fieldType === "password") {
+      passwordInput.setAttribute("type", "text");
+      this.classList.remove("fa-eye");
+      this.classList.add("fa-eye-slash");
+    } else {
+      passwordInput.setAttribute("type", "password");
+      this.classList.remove("fa-eye-slash");
+      this.classList.add("fa-eye");
+    }
+  });
+</script>
+</body>
 </html>

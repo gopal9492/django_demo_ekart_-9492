@@ -28,14 +28,10 @@
             border-bottom: 1px solid #ccc;
         }
         .product {
-            display: inline-block;
-            padding-left: 120px !important;
-            padding-right: 50px !important;
-            margin-bottom: 20px;
-            background-color: #f9f9f9;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+             display: inline-flex;
+              margin-bottom: 30px;
+              padding: 40px;
+
         }
         .product img {
             width: 100px;
@@ -78,29 +74,43 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             z-index: 1000;
         }
+        .nav-links a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
     </style>
+
 </head>
 <body>
-
     <div class="container">
         <div class="header">
-            <tr>
-                <div>
-                    <img src="{% if user.profile_image %}{{ user.profile_image.url }}{% endif %}" style="width: 70px; height: 80px; border-radius: 50%;">
-                    <br>
-                    <span><b>&nbsp;{{ user.fullname }}</b></span>
-                </div>
-
-                <div><a href="{% url 'user_profile' %}">View Profile</a></div>
-                <div><a href="{% url 'edit_user_details' %}">Edit Profile</a></div>
-                <div><a href="{% url 'cart' %}" class="cart-details-link">Cart Items</a></div>
-                <div><a href="{% url 'logout' %}" class="logout-link">Logout</a></div>
-            </tr>
+            <div>
+                <img src="{% if user.profile_image %}{{ user.profile_image.url }}{% endif %}" style="width: 70px; height: 80px; border-radius: 50%;">
+                <br>
+                <span><b>&nbsp;{{ user.fullname }}</b></span>
+            </div>
+            <div><a href="{% url 'user_profile' %}">View Profile</a></div>
+            <div><a href="{% url 'edit_user_details' %}">Edit Profile</a></div>
+            <div><a href="{% url 'cart' %}" class="cart-details-link">Cart Items</a></div>
+            <div><a href="{% url 'logout' %}" class="logout-link">Logout</a></div>
         </div>
-        <div class="title" align="center"><u>Welcome to Our E-commerce Web Store</u></div> <br><br>
-
+        <div class="title" align="center"><u>Welcome to Our E-commerce Web Store</u></div>
+        <br><br>
+        <div class="nav-links">
+            <a href="{% url 'home' %}?category=all">All</a>
+            <a href="{% url 'home' %}?category=vegitables">Vegetables</a>
+            <a href="{% url 'home' %}?category=mobiles">Mobiles</a>
+            <a href="{% url 'home' %}?category=Fashions">Fashions</a>
+            <a href="{% url 'home' %}?category=Laptops">Laptops</a>
+        </div>
+        <br>
         <div id="popup-message" class="popup-message"></div>
-
         <div class="product-list">
             {% for product in products %}
                 <div class="product">
@@ -116,7 +126,6 @@
             {% endfor %}
         </div>
     </div>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             {% if message %}
@@ -132,6 +141,30 @@
                 popup.style.display = 'none';
             }, 3000);
         }
+
+        (function() {
+            var seconds = 0;
+            var max_inactivity = 60;
+
+            function resetTimer() {
+                seconds = 0;
+            }
+
+            window.onload = resetTimer;
+            window.onmousemove = resetTimer;
+            window.onmousedown = resetTimer;
+            window.ontouchstart = resetTimer;
+            window.onclick = resetTimer;
+            window.onkeypress = resetTimer;
+            window.addEventListener('scroll', resetTimer, true);
+
+            setInterval(function() {
+                seconds++;
+                if (seconds >= max_inactivity) {
+                    window.location.href = "{% url 'logout' %}";
+                }
+            }, 600000);
+        })();
     </script>
 </body>
 </html>
