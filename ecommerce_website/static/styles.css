@@ -98,7 +98,7 @@ form .input-box span.details{
 }
 .user-details .input-box input{
   height: 45px;
-  width: 100%;
+  width: 90%;
   outline: none;
   font-size: 16px;
   border-radius: 5px;
@@ -171,7 +171,7 @@ form .input-box span.details{
 }
 form .user-details .input-box{
     margin-bottom: 15px;
-    width: 100%;
+    width: 90%;
   }
   form .category{
     width: 100%;

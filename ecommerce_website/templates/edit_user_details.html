@@ -5,6 +5,7 @@
     <title>Edit User Details</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
 <div class="container">
@@ -27,6 +28,7 @@
                 <div class="input-box">
                     <span class="details">password</span>
                     <input type="password" id="password" name="password" value="{{ user.password }}" required>
+                    <span class="fa fa-fw fa-eye field-icon toggle-password"></span>
                 </div>
                 <div class="input-box">
                     <span class="details">Mobile</span>
@@ -56,11 +58,30 @@
 </div>
 
 <script>
-    function validatemobileinput(input) {
-        if (input.value.length > 10) {
-            input.value = input.value.slice(0, 10);
-        }
+     function validatemobileinput(input) {
+     const value = input.value;
+
+     if (value.length > 10)
+         input.value = value.slice(0, 10);
+     if (value === '0000000000') {
+         alert('All zeros are not accepted');
+         input.value = '';
+     }
+ }
+
+      document.querySelector(".toggle-password").addEventListener("click", function() {
+    const passwordInput = document.getElementById("password");
+    const fieldType = passwordInput.getAttribute("type");
+    if (fieldType === "password") {
+      passwordInput.setAttribute("type", "text");
+      this.classList.remove("fa-eye");
+      this.classList.add("fa-eye-slash");
+    } else {
+      passwordInput.setAttribute("type", "password");
+      this.classList.remove("fa-eye-slash");
+      this.classList.add("fa-eye");
     }
+  });
 </script>
 </body>
 </html>

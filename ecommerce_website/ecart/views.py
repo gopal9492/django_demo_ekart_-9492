@@ -3,8 +3,61 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.contrib.auth.hashers import make_password, check_password
 from .models import user_profiles, user_product, user_cart
+from cryptography.fernet import Fernet
+import base64
+
+# Load the key from settings or an environment variable
+fernet_key = settings.FERNET_KEY.encode()
+key = Fernet(fernet_key)
+
+
+def login_page(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+
+        try:
+            user = user_profiles.objects.get(username=username)
+            decrypted_password = key.decrypt(user.password.encode()).decode()
+            if password == decrypted_password:
+                request.session['user_id'] = user.id
+                return redirect('home')
+            else:
+                error_message = "Invalid username/password."
+        except user_profiles.DoesNotExist:
+            error_message = "Invalid username/password."
+        except Exception as e:
+            error_message = "Error decrypting password. Please try again."
+
+        return render(request, 'login.html', {'error_message': error_message})
+
+    return render(request, 'login.html')
+
+
+def signup_page(request):
+    if request.method == 'POST':
+        fullname = request.POST['fullname']
+        username = request.POST['username']
+        email = request.POST['email']
+        password = request.POST['password']
+        encrypted_password = key.encrypt(password.encode()).decode()
+        mobile = request.POST['mobile']
+        profile_image = request.FILES['img']
+        gender = request.POST['gender']
+        city = request.POST['city']
+
+        if user_profiles.objects.filter(username=username).exists():
+            error_message = "Username already exists. Please choose a different username."
+            return render(request, 'signup.html', {'error_message': error_message})
+
+        user_profiles.objects.create(
+            fullname=fullname, username=username, email=email, password=encrypted_password,
+            mobile=mobile, profile_image=profile_image, gender=gender, city=city)
+        messages.success(request, "Successfully Details Stored..")
+        return redirect('login')
+
+    return render(request, 'signup.html')
 
 
 def home(request):
@@ -17,54 +70,24 @@ def home(request):
     except user_profiles.DoesNotExist:
         return redirect('login')
 
-    products = user_product.objects.all()
+    category = request.GET.get('category', 'all')
+
+    if category == 'vegitables':
+        products = user_product.objects.filter(category='vegitables')
+    elif category == 'mobiles':
+        products = user_product.objects.filter(category='mobiles')
+    elif category == 'Fashions':
+        products = user_product.objects.filter(category='Fashions')
+    elif category == 'Laptops':
+        products = user_product.objects.filter(category='Laptops')
+    else:
+        products = user_product.objects.all()
+
     context = {
         'products': products,
         'user': user,
     }
     return render(request, 'home.html', context)
-
-
-def login_page(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-
-        try:
-            user = user_profiles.objects.get(username=username)
-            if check_password(password, user.password):
-                request.session['user_id'] = user.id
-                return redirect('home')
-            else:
-                error_message = "Invalid username/password."
-        except user_profiles.DoesNotExist:
-            error_message = "Invalid username/password."
-            return render(request, 'login.html', {'error_message': error_message})
-    return render(request, 'login.html')
-
-
-def signup_page(request):
-    if request.method == 'POST':
-        fullname = request.POST['fullname']
-        username = request.POST['username']
-        email = request.POST['email']
-        password = make_password(request.POST['password'])
-        mobile = request.POST['mobile']
-        profile_image = request.FILES['img']
-        gender = request.POST['gender']
-        city = request.POST['city']
-
-        if user_profiles.objects.filter(username=username).exists():
-            error_message = "Username already exists. Please choose a different username."
-            return render(request, 'signup.html', {'error_message': error_message})
-
-        user_profiles.objects.create(
-            fullname=fullname, username=username, email=email, password=password, mobile=mobile,
-            profile_image=profile_image, gender=gender, city=city)
-        messages.success(request, "Successfully Details Stored..")
-        return redirect('login')
-
-    return render(request, 'signup.html')
 
 
 def user_profile(request):
@@ -81,6 +104,7 @@ def edit_user_details(request):
     user_id = request.session.get('user_id')
     try:
         user = user_profiles.objects.get(id=user_id)
+        user.password = key.decrypt(user.password.encode()).decode()
     except user_profiles.DoesNotExist:
         return HttpResponse('User not found')
 
@@ -90,6 +114,8 @@ def edit_user_details(request):
         user.mobile = request.POST.get('mobile')
         user.gender = request.POST.get('gender')
         user.city = request.POST.get('city')
+        new_password = request.POST.get('password')
+        user.password = key.encrypt(new_password.encode()).decode()
         user.save()
         return redirect('user_profile')
 
@@ -108,20 +134,23 @@ def forgot_pwd(request):
         username = request.POST['username']
         try:
             user = user_profiles.objects.get(username=username)
-            password = user.password
-            send_password_email(user, password)
+            decrypted_password = key.decrypt(user.password.encode()).decode()
+            send_password_email(user, decrypted_password)
             messages.success(request, "Successfully sent password to email.")
             return redirect('login')
         except user_profiles.DoesNotExist:
             messages.error(request, "Username does not exist.")
-            return redirect('forgotpwd')
+        except Exception as e:
+            messages.error(request, "Error decrypting password. Please try again.")
+
+        return redirect('forgotpwd')
 
     return render(request, 'forgotpwd.html')
 
 
 def send_password_email(user, password):
     subject = 'Password Recovery'
-    message = f'Hello {user.fullname},\n\n Your password is: {password}\n\n Thank you!'
+    message = f'Hello {user.fullname},\n\n Your password is: {key.decrypt(user.password.encode()).decode()}\n\n Thank you!'
     from_email = settings.EMAIL_HOST_USER
     to_email = [user.email]
 
@@ -158,7 +187,7 @@ def add_to_cart(request, product_id):
         product = user_product.objects.get(id=product_id)
         cart_item, created = user_cart.objects.get_or_create(user=user, product=product)
         if not created:
-            cart_item.quantity = cart_item.quantity + 1
+            cart_item.quantity += 1
             cart_item.save()
     except (user_profiles.DoesNotExist, user_product.DoesNotExist):
         return HttpResponse('User or Product not found')

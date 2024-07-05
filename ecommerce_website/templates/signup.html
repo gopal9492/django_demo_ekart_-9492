@@ -5,39 +5,42 @@
     <title>Sign Up</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
 <div class="container">
     <div class="title">Sign Up</div>
     {% if error_message %}
-        <p style='color:red'>{{ error_message }}</p>
+    <p style='color:red'>{{ error_message }}</p>
     {% endif %}
     <div class="content">
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="user-details">
                 <div class="input-box">
-                    <span class="details">Full Name</span>
+                    <span class="details">Full Name <span style="color:red">*</span></span>
                     <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" required>
                 </div>
                 <div class="input-box">
-                    <span class="details">Username</span>
+                    <span class="details">Username <span style="color:red">*</span></span>
                     <input type="text" id="username" name="username" placeholder="Enter your username" required>
                 </div>
                 <div class="input-box">
-                    <span class="details">Email</span>
+                    <span class="details">Email <span style="color:red">*</span></span>
                     <input type="email" id="email" name="email" placeholder="Enter your email" required>
                 </div>
                 <div class="input-box">
-                    <span class="details">Password</span>
+                    <span class="details">Password <span style="color:red">*</span></span>
                     <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                    <span class="fa fa-fw fa-eye field-icon toggle-password"></span>
                 </div>
                 <div class="input-box">
-                    <span class="details">Mobile</span>
-                    <input type="number" id="mobile" name="mobile" placeholder="Enter your mobile number" required oninput="validatemobileinput(this)">
+                    <span class="details">Mobile <span style="color:red">*</span></span>
+                    <input type="number" id="mobile" name="mobile" placeholder="Enter your mobile number" required
+                           oninput="validatemobileinput(this)">
                 </div>
                 <div class="input-box">
-                    <span class="details">Profile Image</span>
+                    <span class="details">Profile Image <span style="color:red">*</span></span>
                     <input type="file" id="img" name="img" accept="image/*" required>
                 </div>
                 <div class="input-box">
@@ -49,7 +52,7 @@
                     </select>
                 </div>
                 <div class="input-box">
-                    <span class="details">City</span>
+                    <span class="details">City <span style="color:red">*</span></span>
                     <input type="text" id="city" name="city" placeholder="Enter your city" required>
                 </div>
             </div>
@@ -64,10 +67,32 @@
 </div>
 <script>
     function validatemobileinput(input) {
-        if (input.value.length > 10) {
-            input.value = input.value.slice(0, 10);
-        }
-    }
+     const value = input.value;
+
+     if (value.length > 10)
+         input.value = value.slice(0, 10);
+     if (value === '0000000000') {
+         alert('All zeros are not accepted');
+         input.value = '';
+     }
+ }
+
+
+
+
+       document.querySelector(".toggle-password").addEventListener("click", function() {
+     const passwordInput = document.getElementById("password");
+     const fieldType = passwordInput.getAttribute("type");
+     if (fieldType === "password") {
+       passwordInput.setAttribute("type", "text");
+       this.classList.remove("fa-eye");
+       this.classList.add("fa-eye-slash");
+     } else {
+       passwordInput.setAttribute("type", "password");
+       this.classList.remove("fa-eye-slash");
+       this.classList.add("fa-eye");
+     }
+   });
 </script>
 </body>
 </html>
