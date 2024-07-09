@@ -67,14 +67,15 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
 }
-.nav-links a {
+.products-links a {
     margin-right: 15px;
     text-decoration: none;
     color: #007bff;
     font-weight: bold;
     cursor: pointer;
 }
-.nav-links .active {
+
+.products-links .activeClass{
     color: green;
     text-decoration: underline;
 }

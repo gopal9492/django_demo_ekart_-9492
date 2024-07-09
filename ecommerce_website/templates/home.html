@@ -20,12 +20,17 @@
         </div>
         <div class="title" align="center"><u>Welcome to Our E-commerce Web Store</u></div>
         <br><br>
-        <div class="nav-links">
-            <a href="{% url 'home' %}?category=all" class="{% if request.GET.category == 'all' or not request.GET.category %}active{% endif %}">All</a>
-            <a href="{% url 'home' %}?category=vegitables" class="{% if request.GET.category == 'vegitables' %}active{% endif %}">Vegetables</a>
-            <a href="{% url 'home' %}?category=mobiles" class="{% if request.GET.category == 'mobiles' %}active{% endif %}">Mobiles</a>
-            <a href="{% url 'home' %}?category=Fashions" class="{% if request.GET.category == 'Fashions' %}active{% endif %}">Fashions</a>
-            <a href="{% url 'home' %}?category=Laptops" class="{% if request.GET.category == 'Laptops' %}active{% endif %}">Laptops</a>
+        <div class="products-links">
+            <!--
+            {% if category == 'all' %}
+                <a href="{% url 'home' %}?category=all"><span style="color:green"> All</span></a>
+            {% endif %}
+            -->
+            <a href="{% url 'home' %}?category=all" class="{% if category == 'all' %}activeClass{% else %}nonActiveClass{% endif %}">All</a>
+            <a href="{% url 'home' %}?category=vegitables" class="{% if category == 'vegitables' %}activeClass{% else %}nonActiveClass{% endif %}">Vegetables</a>
+            <a href="{% url 'home' %}?category=mobiles" class="{% if category == 'mobiles' %}activeClass{% else %}nonActiveClass{% endif %}">Mobiles</a>
+            <a href="{% url 'home' %}?category=Fashions" class="{% if category == 'Fashions' %}activeClass{% else %}nonActiveClass{% endif %}">Fashions</a>
+            <a href="{% url 'home' %}?category=Laptops" class="{% if category == 'Laptops' %}activeClass{% else %}nonActiveClass{% endif %}">Laptops</a>
         </div>
         <br>
         <div id="popup-message" class="popup-message"></div>
@@ -36,7 +41,7 @@
                     <div class="product-details">
                         <h3>{{ product.name }}</h3>
                         <p class="price">{{ product.price }}</p>
-                        <a href="{% url 'add_to_cart' product.id %}" class="add-to-cart-btn">Add to Cart</a>
+                        <a href="{% url 'add_to_cart' product.id %}?category={{ category }}" class="add-to-cart-btn">Add to Cart</a>
                     </div>
                 </div>
             {% empty %}

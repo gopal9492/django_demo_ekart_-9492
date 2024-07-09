@@ -88,7 +88,7 @@ DATABASES = {
 }
 
 
-# Password validation
+# Password validation " Fernet key must be 32 url-safe base64-encoded bytes"
 FERNET_KEY = '9zFv1Ts6lUy0ZmGfNcyP4Y9lfVqN8Rnxn5hzzIQY9PA='
 
 
