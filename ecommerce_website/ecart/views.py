@@ -5,9 +5,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import user_profiles, user_product, user_cart
 from cryptography.fernet import Fernet
-import base64
 
-# Load the key from settings or an environment variable
+
 fernet_key = settings.FERNET_KEY.encode()
 key = Fernet(fernet_key)
 
@@ -72,22 +71,21 @@ def home(request):
 
     category = request.GET.get('category', 'all')
 
-    if category == 'vegitables':
-        products = user_product.objects.filter(category='vegitables')
-    elif category == 'mobiles':
-        products = user_product.objects.filter(category='mobiles')
-    elif category == 'Fashions':
-        products = user_product.objects.filter(category='Fashions')
-    elif category == 'Laptops':
-        products = user_product.objects.filter(category='Laptops')
+    if category != 'all':
+        products = user_product.objects.filter(category=category)
     else:
         products = user_product.objects.all()
+
+    message = request.session.pop('message', '')
 
     context = {
         'products': products,
         'user': user,
+        'message': message,
+        'category': category,
     }
     return render(request, 'home.html', context)
+
 
 
 def user_profile(request):
@@ -192,9 +190,10 @@ def add_to_cart(request, product_id):
     except (user_profiles.DoesNotExist, user_product.DoesNotExist):
         return HttpResponse('User or Product not found')
 
-    products = user_product.objects.all()
-    message = "Your item is added into cart"
-    return render(request, 'home.html', {'products': products, 'user': user, 'message': message})
+    category = request.GET.get('category', 'all')
+    request.session['message'] = "Your item is added to cart"
+
+    return redirect(f'/home?category={category}')
 
 
 def remove_from_cart(request, cart_id):

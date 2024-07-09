@@ -1,91 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'homestyle.css' %}">
     <title>Home</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #ccc;
-        }
-        .product {
-             display: inline-flex;
-              margin-bottom: 30px;
-              padding: 40px;
-
-        }
-        .product img {
-            width: 100px;
-            height: 100px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-        .product-details {
-            padding: 10px 0;
-        }
-        .product-details h3 {
-            margin-bottom: 5px;
-        }
-        .price {
-            font-weight: bold;
-            color: #333;
-        }
-        .add-to-cart-btn {
-            display: inline-block;
-            padding: 5px 10px;
-            background-color: #007bff;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-            cursor: pointer;
-        }
-        .add-to-cart-btn:hover {
-            background-color: #0056b3;
-        }
-        .popup-message {
-            display: none;
-            position: fixed;
-            top: 30px;
-            right: 15%;
-            background-color: #4caf50;
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-        }
-        .nav-links a {
-            margin-right: 15px;
-            text-decoration: none;
-            color: #007bff;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .nav-links a:hover {
-            text-decoration: underline;
-        }
-    </style>
-
 </head>
 <body>
     <div class="container">
@@ -102,12 +20,17 @@
         </div>
         <div class="title" align="center"><u>Welcome to Our E-commerce Web Store</u></div>
         <br><br>
-        <div class="nav-links">
-            <a href="{% url 'home' %}?category=all">All</a>
-            <a href="{% url 'home' %}?category=vegitables">Vegetables</a>
-            <a href="{% url 'home' %}?category=mobiles">Mobiles</a>
-            <a href="{% url 'home' %}?category=Fashions">Fashions</a>
-            <a href="{% url 'home' %}?category=Laptops">Laptops</a>
+        <div class="products-links">
+            <!--
+            {% if category == 'all' %}
+                <a href="{% url 'home' %}?category=all"><span style="color:green"> All</span></a>
+            {% endif %}
+            -->
+            <a href="{% url 'home' %}?category=all" class="{% if category == 'all' %}activeClass{% else %}nonActiveClass{% endif %}">All</a>
+            <a href="{% url 'home' %}?category=vegitables" class="{% if category == 'vegitables' %}activeClass{% else %}nonActiveClass{% endif %}">Vegetables</a>
+            <a href="{% url 'home' %}?category=mobiles" class="{% if category == 'mobiles' %}activeClass{% else %}nonActiveClass{% endif %}">Mobiles</a>
+            <a href="{% url 'home' %}?category=Fashions" class="{% if category == 'Fashions' %}activeClass{% else %}nonActiveClass{% endif %}">Fashions</a>
+            <a href="{% url 'home' %}?category=Laptops" class="{% if category == 'Laptops' %}activeClass{% else %}nonActiveClass{% endif %}">Laptops</a>
         </div>
         <br>
         <div id="popup-message" class="popup-message"></div>
@@ -118,7 +41,7 @@
                     <div class="product-details">
                         <h3>{{ product.name }}</h3>
                         <p class="price">{{ product.price }}</p>
-                        <a href="{% url 'add_to_cart' product.id %}" class="add-to-cart-btn">Add to Cart</a>
+                        <a href="{% url 'add_to_cart' product.id %}?category={{ category }}" class="add-to-cart-btn">Add to Cart</a>
                     </div>
                 </div>
             {% empty %}
