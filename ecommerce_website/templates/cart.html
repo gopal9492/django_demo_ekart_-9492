@@ -4,61 +4,81 @@
     <meta charset="UTF-8">
     <title>Cart Details</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <link rel="stylesheet" href="{% static 'cartstyle.css' %}">
+    <script>
+        function updateQuantity(cartId) {
+            const quantityInput = document.getElementById("quantity");
+            const quantity = quantityInput.value;
 
-    <style>
-        .cart-items{
-             display:flex;
+            fetch(`/update_cart_quantity/${cartId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ quantity: quantity })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById(`total-${cartId}`).innerText = data.item_total;
+                    document.getElementById('total-price').innerText = data.total_price;
+                } else {
+                    alert(data.message);
+                }
+            });
         }
-        .cart-item{
-             padding-right:40px;
-        }
-        .cart-items img {
-            width: 100px;
-            height: 100px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-    </style>
+    </script>
+   
 </head>
 <body>
-<div class="container">
-    <div class="title">Cart Details</div><br>
-    <div class="content">
-        <div class="cart-items">
-            {% for entry in cart_items %}
-            <tr>
-                <div class="cart-item">
-                    <img src="{{ entry.item.product.image.url }}" alt="{{ entry.item.product.name }}">
-                    <!--<p>Name: {{entry.item.user.username}}</p>-->
-                    <h3>{{ entry.item.product.name }}</h3>
-                    <p>Price: {{ entry.item.product.price }}</p>
-                    <p>Quantity: {{ entry.item.quantity }}</p>
-                    <p>Total: {{ entry.total }}</p>
-                    <a href="{% url 'remove_from_cart' entry.item.id %}">Remove</a>
-                </div>
-            </tr>
-            {% empty %}
-                <p>No items in cart.</p>
-            {% endfor %}
-        </div><br>
-        <div class="total-price">
-            <h3>Total Price: {{ total_price }}</h3><br>
+    <div class="container">
+        <div class="title">Cart Details</div>
+        <div class="content">
+            <table class="cart-items">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in cart_items %}
+                    <tr class="cart-item">
+                        <td><img src="{{ entry.item.product.image.url }}" alt="{{ entry.item.product.name }}"></td>
+                        <td>{{ entry.item.product.name }}</td>
+                        <td>{{ entry.item.product.price }}</td>
+                        <td>
+                            <input type="number" id="quantity" class="quantity" value="{{ entry.item.quantity }}" onchange="updateQuantity({{ entry.item.id }})" min="1">
+                        </td>
+                        <td><span id="total-{{ entry.item.id }}">{{ entry.total }}</span></td>
+                        <td><a href="{% url 'remove_from_cart' entry.item.id %}">Remove</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">No items in cart.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="total-price">
+                Total Price: <span id="total-price">{{ total_price }}</span>
+            </div>
+            <div>
+                {% if total_price == 0 %}
+                <p>Payment is disabled for zero total price.</p>
+                {% else %}
+                <p>Continue to <a href="{% url 'payment' %}">Payment</a></p>
+                {% endif %}
+            </div>
         </div>
-
-        <div >
-            {% if total_price == 0 %}
-		        <p>Payment is disabled for zero total price.</p>
-            {% else %}
-                 <p>Continue to <a href="{% url 'payment' %}">Payment</a></p>
-            {% endif %}
+        <div class="footer">
+            <p>Go back to <a href="{% url 'home' %}">Home page</a></p>
         </div>
-
-    </div><br>
-
-    <div class="footer">
-        <p>Go back to <a href="{% url 'home' %}">Home page</a></p><br>
     </div>
-</div>
 </body>
 </html>
