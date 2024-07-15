@@ -19,7 +19,7 @@
             <div class="user-details">
                 <div class="input-box">
                     <span class="details">Full Name <span style="color:red">*</span></span>
-                    <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" required>
+                    <input type="text" id="fullname" name="fullname" placeholder="Enter your full name"  minlength="3" required>
                 </div>
                 <div class="input-box">
                     <span class="details">Username <span style="color:red">*</span></span>
@@ -27,7 +27,7 @@
                 </div>
                 <div class="input-box">
                     <span class="details">Email <span style="color:red">*</span></span>
-                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                    <input type="email" id="email" name="email" placeholder="Enter your email"  required>
                 </div>
                 <div class="input-box">
                     <span class="details">Password <span style="color:red">*</span></span>
@@ -80,7 +80,7 @@
 
 
 
-       document.querySelector(".toggle-password").addEventListener("click", function() {
+     document.querySelector(".toggle-password").addEventListener("click", function() {
      const passwordInput = document.getElementById("password");
      const fieldType = passwordInput.getAttribute("type");
      if (fieldType === "password") {

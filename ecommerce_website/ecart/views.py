@@ -1,3 +1,5 @@
+from decimal import Decimal
+import json
 from django.conf import settings
 from django.contrib import messages
 from django.core.mail import send_mail
@@ -5,7 +7,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import user_profiles, user_product, user_cart
 from cryptography.fernet import Fernet
-
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 fernet_key = settings.FERNET_KEY.encode()
 key = Fernet(fernet_key)
@@ -46,15 +49,20 @@ def signup_page(request):
         gender = request.POST['gender']
         city = request.POST['city']
 
-        if user_profiles.objects.filter(username=username).exists():
-            error_message = "Username already exists. Please choose a different username."
-            return render(request, 'signup.html', {'error_message': error_message})
+        try:
+            if user_profiles.objects.get(username=username):
+                error_message = "Username already exists. Please choose a different username."
+                return render(request, 'signup.html', {'error_message': error_message})
+            else:
+                user_profiles.objects.create(
+                    fullname=fullname, username=username, email=email, password=encrypted_password,
+                    mobile=mobile, profile_image=profile_image, gender=gender, city=city)
+                messages.success(request, "Successfully Details Stored..")
+                return redirect('login')
 
-        user_profiles.objects.create(
-            fullname=fullname, username=username, email=email, password=encrypted_password,
-            mobile=mobile, profile_image=profile_image, gender=gender, city=city)
-        messages.success(request, "Successfully Details Stored..")
-        return redirect('login')
+        except user_profiles.DoesNotExist:
+            messages.error(request, "Username already existed.")
+            return redirect('signup')
 
     return render(request, 'signup.html')
 
@@ -155,6 +163,35 @@ def send_password_email(user, password):
     send_mail(subject, message, from_email, to_email, fail_silently=False)
 
 
+
+
+def add_to_cart(request):
+    if request.method == 'POST':
+        user_id = request.session.get('user_id')
+        if not user_id:
+            return JsonResponse({'message': 'Please log in to add items to the cart'}, status=403)
+
+        product_id = request.POST.get('product_id')
+        if not product_id:
+            return JsonResponse({'message': 'Invalid product'}, status=400)
+
+        try:
+            user = user_profiles.objects.get(id=user_id)
+            product = user_product.objects.get(id=product_id)
+            cart_item, created = user_cart.objects.get_or_create(user=user, product=product)
+            if created:
+                message = "Your item has been added to the cart"
+            else:
+                message = "Your item is already in the cart"
+            return JsonResponse({'message': message})
+        except user_profiles.DoesNotExist:
+            return JsonResponse({'message': 'User not found'}, status=404)
+        except user_product.DoesNotExist:
+            return JsonResponse({'message': 'Product not found'}, status=404)
+    return JsonResponse({'message': 'Invalid request method'}, status=405)
+
+
+
 def cart(request):
     user_id = request.session.get('user_id')
     if not user_id:
@@ -174,28 +211,6 @@ def cart(request):
 
     return render(request, 'cart.html', {'cart_items': cart_items_with_totals, 'total_price': total_price})
 
-
-def add_to_cart(request, product_id):
-    user_id = request.session.get('user_id')
-    if not user_id:
-        return redirect('login')
-
-    try:
-        user = user_profiles.objects.get(id=user_id)
-        product = user_product.objects.get(id=product_id)
-        cart_item, created = user_cart.objects.get_or_create(user=user, product=product)
-        if not created:
-            cart_item.quantity += 1
-            cart_item.save()
-    except (user_profiles.DoesNotExist, user_product.DoesNotExist):
-        return HttpResponse('User or Product not found')
-
-    category = request.GET.get('category', 'all')
-    request.session['message'] = "Your item is added to cart"
-
-    return redirect(f'/home?category={category}')
-
-
 def remove_from_cart(request, cart_id):
     user_id = request.session.get('user_id')
     if not user_id:
@@ -210,6 +225,30 @@ def remove_from_cart(request, cart_id):
 
     return redirect('cart')
 
+@csrf_exempt
+def update_cart_quantity(request, cart_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        quantity = int(data.get('quantity'))
+
+        user_id = request.session.get('user_id')
+        if not user_id:
+            return JsonResponse({'success': False, 'message': 'User not logged in'})
+
+        try:
+            user = user_profiles.objects.get(id=user_id)
+            cart_item = user_cart.objects.get(id=cart_id, user=user)
+            cart_item.quantity = quantity
+            cart_item.save()
+            
+            total_price = sum(item.product.price * item.quantity for item in user_cart.objects.filter(user=user))
+            item_total = cart_item.product.price * Decimal(cart_item.quantity)
+            
+            return JsonResponse({'success': True, 'total_price': total_price, 'item_total': item_total})
+        except (user_profiles.DoesNotExist, user_cart.DoesNotExist):
+            return JsonResponse({'success': False, 'message': 'User or Cart item not found'})
+
+    return JsonResponse({'success': False, 'message': 'Invalid request method'})
 
 def payment(request):
     user_id = request.session.get('user_id')
