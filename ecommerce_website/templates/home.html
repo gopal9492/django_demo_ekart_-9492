@@ -1,104 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'homestyle.css' %}">
-    <title>Home</title>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
+   <head>
+      {% load static %}
+      <link rel="stylesheet" href="{% static 'homestyle.css' %}">
+      <title>Home</title>
+      <style>
+         .search_bar{
+         }
+      </style>
+   </head>
+   <body>
+      <div class="container">
+         <div class="header">
             <div>
-                <img src="{% if user.profile_image %}{{ user.profile_image.url }}{% endif %}" style="width: 70px; height: 80px; border-radius: 50%;">
-                <br>
-                <span><b>&nbsp;{{ user.fullname }}</b></span>
+               <img src="{% if user.profile_image %}{{ user.profile_image.url }}{% endif %}" style="width: 70px; height: 80px; border-radius: 50%;">
+               <br>
+               <span><b>&nbsp;{{ user.fullname }}</b></span>
             </div>
             <div><a href="{% url 'user_profile' %}">View Profile</a></div>
             <div><a href="{% url 'edit_user_details' %}">Edit Profile</a></div>
             <div><a href="{% url 'cart' %}" class="cart-details-link">Cart Items</a></div>
             <div><a href="{% url 'logout' %}" class="logout-link">Logout</a></div>
+         </div>
+         <div class="title" align="center"><u>Welcome to Our E-commerce Web Store</u></div>
+       
+         <br><br>
+         <div class="products-links">
+            <div class="product-menu">
+                <a href="{% url 'home' %}?category=all" class="{% if category == 'all' %}activeClass{% else %}nonActiveClass{% endif %}">All</a>
+                <a href="{% url 'home' %}?category=vegitables" class="{% if category == 'vegitables' %}activeClass{% else %}nonActiveClass{% endif %}">Vegetables</a>
+                <a href="{% url 'home' %}?category=mobiles" class="{% if category == 'mobiles' %}activeClass{% else %}nonActiveClass{% endif %}">Mobiles</a>
+                <a href="{% url 'home' %}?category=Fashions" class="{% if category == 'Fashions' %}activeClass{% else %}nonActiveClass{% endif %}">Fashions</a>
+                <a href="{% url 'home' %}?category=Laptops" class="{% if category == 'Laptops' %}activeClass{% else %}nonActiveClass{% endif %}">Laptops</a>
+            </div>
+            <div class="search_bar">
+                 <form  action="{% url 'home' %}" method="get">
+                     <input type="text" placeholder="Search.." name="search2">
+                      <button type="submit">search</button>
+                 </form>
+            </div>
         </div>
-        <div class="title" align="center"><u>Welcome to Our E-commerce Web Store</u></div>
-        <br><br>
-        <div class="products-links">
-            <a href="{% url 'home' %}?category=all" class="{% if category == 'all' %}activeClass{% else %}nonActiveClass{% endif %}">All</a>
-            <a href="{% url 'home' %}?category=vegitables" class="{% if category == 'vegitables' %}activeClass{% else %}nonActiveClass{% endif %}">Vegetables</a>
-            <a href="{% url 'home' %}?category=mobiles" class="{% if category == 'mobiles' %}activeClass{% else %}nonActiveClass{% endif %}">Mobiles</a>
-            <a href="{% url 'home' %}?category=Fashions" class="{% if category == 'Fashions' %}activeClass{% else %}nonActiveClass{% endif %}">Fashions</a>
-            <a href="{% url 'home' %}?category=Laptops" class="{% if category == 'Laptops' %}activeClass{% else %}nonActiveClass{% endif %}">Laptops</a>
-        </div>
-        <br>
-        <div id="popup-message" class="popup-message"></div>
-        <div class="product-list">
+         
+         <br>
+         <div id="popup-message" class="popup-message"></div>
+         <div class="product-list">
             {% for product in products %}
-                <div class="product">
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                    <div class="product-details">
-                        <h3>{{ product.name }}</h3>
-                        <p class="price">{{ product.price }}</p>
-                        <button onclick="addToCart({{ product.id }})" class="add-to-cart-btn">Add to Cart</button>
-                    </div>
-                </div>
+            <div class="product">
+               <img src="{{ product.image.url }}" alt="{{ product.name }}">
+               <div class="product-details">
+                  <h3>{{ product.name }}</h3>
+                  <p class="price">{{ product.price }}</p>
+                  <button onclick="addToCart({{ product.id }})" class="add-to-cart-btn">Add to Cart</button>
+               </div>
+            </div>
             {% empty %}
-                <p>No products available.</p>
+            <p>No products available.</p>
             {% endfor %}
-        </div>
-    </div>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            {% if message %}
-            showPopupMessage("{{ message }}");
-            {% endif %}
-        });
-
-        function showPopupMessage(message) {
-            const popup = document.getElementById('popup-message');
-            popup.innerText = message;
-            popup.style.display = 'block';
-            setTimeout(() => {
-                popup.style.display = 'none';
-            }, 3000);
-        }
-
-        (function() {
-            var seconds = 0;
-            var max_inactivity = 60;
-
-            function resetTimer() {
-                seconds = 0;
-            }
-
-            window.onload = resetTimer;
-            window.onmousemove = resetTimer;
-            window.onmousedown = resetTimer;
-            window.ontouchstart = resetTimer;
-            window.onclick = resetTimer;
-            window.onkeypress = resetTimer;
-            window.addEventListener('scroll', resetTimer, true);
-
-            setInterval(function() {
-                seconds++;
-                if (seconds >= max_inactivity) {
-                    window.location.href = "{% url 'logout' %}";
-                }
-            }, 600000);
-        })();
-
-        function addToCart(productId) {
-            const xhr = new XMLHttpRequest();
-            xhr.open("POST", "{% url 'add_to_cart' %}", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    const response = JSON.parse(xhr.responseText);
-                    showPopupMessage(response.message);
-                }
-            };
-
-            xhr.send(`product_id=${productId}`);
-        }
-    </script>
-</body>
+         </div>
+      </div>
+      <script>
+         document.addEventListener("DOMContentLoaded", function() {
+             {% if message %}
+             showPopupMessage("{{ message }}");
+             {% endif %}
+         });
+         
+         function showPopupMessage(message) {
+             const popup = document.getElementById('popup-message');
+             popup.innerText = message;
+             popup.style.display = 'block';
+             setTimeout(() => {
+                 popup.style.display = 'none';
+             }, 3000);
+         }
+         
+         (function() {
+             var seconds = 0;
+             var max_inactivity = 60;
+         
+             function resetTimer() {
+                 seconds = 0;
+             }
+         
+             window.onload = resetTimer;
+             window.onmousemove = resetTimer;
+             window.onmousedown = resetTimer;
+             window.ontouchstart = resetTimer;
+             window.onclick = resetTimer;
+             window.onkeypress = resetTimer;
+             window.addEventListener('scroll', resetTimer, true);
+         
+             setInterval(function() {
+                 seconds++;
+                 if (seconds >= max_inactivity) {
+                     window.location.href = "{% url 'logout' %}";
+                 }
+             }, 600000);
+         })();
+         
+         function addToCart(productId) {
+             const xhr = new XMLHttpRequest();
+             xhr.open("POST", "{% url 'add_to_cart' %}", true);
+             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+             xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+         
+             xhr.onreadystatechange = function () {
+                 if (xhr.readyState === 4 && xhr.status === 200) {
+                     const response = JSON.parse(xhr.responseText);
+                     showPopupMessage(response.message);
+                 }
+             };
+         
+             xhr.send(`product_id=${productId}`);
+         }
+      </script>
+   </body>
 </html>

@@ -67,7 +67,24 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
 }
-.products-links a {
+
+.products-links{
+    display: flex;
+}
+
+.products-links .product-menu {
+   width: 50%;
+   display: inline-block;
+}
+
+.products-links .search_bar {
+    width: 50%;
+    display: inline-block;
+    text-align: right;
+ }
+
+
+.products-links .product-menu a {
     margin-right: 15px;
     text-decoration: none;
     color: #007bff;
@@ -75,7 +92,11 @@ body {
     cursor: pointer;
 }
 
-.products-links .activeClass{
+
+
+.products-links .product-menu .activeClass{
     color: green;
     text-decoration: underline;
 }
+
+
