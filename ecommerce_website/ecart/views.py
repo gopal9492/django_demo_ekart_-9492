@@ -145,7 +145,7 @@ def forgot_pwd(request):
         try:
             user = user_profiles.objects.get(username=username)
             decrypted_password = key.decrypt(user.password.encode()).decode()
-          #  send_password_email(user, decrypted_password)
+          #  send_password_email(user, decrypted_password) #to get forget pwd, update ur EMAIL_HOST_USER and EMAIL_HOST_PASSWORD in settings
             messages.success(request, "Successfully sent password to email.")
             return redirect('login')
         except user_profiles.DoesNotExist:
